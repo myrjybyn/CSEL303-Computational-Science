@@ -348,3 +348,32 @@ document.getElementById("sensRunBtn").addEventListener("click", async () => {
   // Auto-run on load with defaults
   document.getElementById("runBtn").click();
 })();
+
+// ── Download Summary Results (NEW)─────────────────────────────────────────────────────
+document.getElementById("downloadBtn").addEventListener("click", async () => {
+  const params = getParams();
+
+  try {
+    const res = await fetch("/api/export_csv", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(params)
+    });
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "seir_results.csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error("Download failed:", err);
+  }
+});
